@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tank Filling Indicator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #e0f7fa;
+        }
+        .tank-container {
+            width: 120px;
+            height: 250px;
+            border: 4px solid #000;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            background-color: #d1e3ff;
+            margin: 50px auto;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .tank-fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(to top, #0044cc, #00aaff);
+            transition: height 1s ease-in-out;
+            border-radius: 0 0 15px 15px;
+            box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .fill-percentage {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0044cc;
+            margin-top: 20px;
+        }
+        .input-container {
+            margin-top: 20px;
+        }
+        .input-container input {
+            padding: 8px;
+            font-size: 16px;
+            width: 80px;
+            text-align: center;
+        }
+        .input-container button {
+            padding: 8px 12px;
+            font-size: 16px;
+            background-color: #0044cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-left: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body onload="setInterval(fetchTankLevel, 5000);">
+    <h1 style="color: #0044cc;">Tank Filling Level</h1>
+    <div class="tank-container">
+        <div class="tank-fill" id="tankFill" style="height: 0%;"></div>
+    </div>
+    <p id="fillPercentage" class="fill-percentage">Loading...</p>
+    
+    <div class="input-container">
+        <input type="number" id="inputValue" placeholder="Enter value" />
+        <button onclick="sendValue()">Submit</button>
+    </div>
+
+    <script>
+        async function fetchTankLevel() {
+            try {
+                let response = await fetch('https://api.thingspeak.com/channels/2763538/fields/1.json?api_key=27SHC4WNBKZR5UII&results=1');
+                let data = await response.json();
+                let fillLevel = data.feeds[0].field1;
+                fillLevel = parseInt(fillLevel, 10);
+                
+                document.getElementById("tankFill").style.height = fillLevel + "%";
+                document.getElementById("fillPercentage").innerText = "Fill Level: " + fillLevel + "%";
+            } catch (error) {
+                console.error("Error fetching tank level:", error);
+                document.getElementById("fillPercentage").innerText = "Error loading data";
+            }
+        }
+        
+        async function sendValue() {
+            let inputValue = document.getElementById("inputValue").value;
+            if (inputValue === "") {
+                alert("Please enter a value");
+                return;
+            }
+            
+            try {
+                let response = await fetch(`https://api.thingspeak.com/update?api_key=BCMV9XYKWWY31CWV&field1=${inputValue}`);
+                let result = await response.text();
+                if (result == 0) {
+                    alert("Failed to update value. Please try again.");
+                } else {
+                    alert("Value sent successfully!");
+                }
+            } catch (error) {
+                console.error("Error sending value:", error);
+                alert("Failed to send value");
+            }
+        }
+    </script>
+</body>
+</html>
