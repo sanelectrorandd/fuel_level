@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tank Filling Indicator</title>
+    <title>Fuel Tank Indicator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,28 +12,28 @@
         }
         .tank-container {
             width: 120px;
-            height: 250px;
-            border: 4px solid #000;
-            border-radius: 15px;
+            height: 300px;
+            border: 6px solid #000;
+            border-radius: 10px;
             position: relative;
             overflow: hidden;
             background-color: #d1e3ff;
             margin: 50px auto;
-            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
         }
         .tank-fill {
             position: absolute;
             bottom: 0;
             width: 100%;
-            background: linear-gradient(to top, #0044cc, #00aaff);
+            background: linear-gradient(to top, #ffcc00, #ff9900);
             transition: height 1s ease-in-out;
-            border-radius: 0 0 15px 15px;
-            box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.2);
+            border-radius: 0 0 10px 10px;
+            box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.3);
         }
         .fill-percentage {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
-            color: #0044cc;
+            color: #ff9900;
             margin-top: 20px;
         }
         .input-container {
@@ -48,7 +48,7 @@
         .input-container button {
             padding: 8px 12px;
             font-size: 16px;
-            background-color: #0044cc;
+            background-color: #ff9900;
             color: white;
             border: none;
             cursor: pointer;
@@ -58,7 +58,7 @@
     </style>
 </head>
 <body onload="setInterval(fetchTankLevel, 5000);">
-    <h1 style="color: #0044cc;">Tank Filling Level</h1>
+    <h1 style="color: #ff9900;">Fuel Tank Level</h1>
     <div class="tank-container">
         <div class="tank-fill" id="tankFill" style="height: 0%;"></div>
     </div>
@@ -78,7 +78,7 @@
                 fillLevel = parseInt(fillLevel, 10);
                 
                 document.getElementById("tankFill").style.height = fillLevel + "%";
-                document.getElementById("fillPercentage").innerText = "Fill Level: " + fillLevel + "%";
+                document.getElementById("fillPercentage").innerText = "Fuel Level: " + fillLevel + "%";
             } catch (error) {
                 console.error("Error fetching tank level:", error);
                 document.getElementById("fillPercentage").innerText = "Error loading data";
