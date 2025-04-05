@@ -72,7 +72,8 @@
     <script>
         async function fetchTankLevel() {
             try {
-                let response = await fetch('https://api.thingspeak.com/channels/2763538/fields/1.json?api_key=27SHC4WNBKZR5UII&results=1');
+                let response = await fetch('https://api.thingspeak.com/channels/2907018/fields/1.json?api_key=2M0WL9NSRX1R01WK&results=1');                
+
                 let data = await response.json();
                 let fillLevel = data.feeds[0].field1;
                 fillLevel = parseInt(fillLevel, 10);
@@ -93,7 +94,7 @@
             }
             
             try {
-                let response = await fetch(`https://api.thingspeak.com/update?api_key=BCMV9XYKWWY31CWV&field1=${inputValue}`);
+                let response = await fetch(`https://api.thingspeak.com/update?api_key=MF4S9JJ3OT534KF5&field1=${inputValue}`);
                 let result = await response.text();
                 if (result == 0) {
                     alert("Failed to update value. Please try again.");
