@@ -1,111 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fuel Tank Indicator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #e0f7fa;
-        }
-        .tank-container {
-            width: 120px;
-            height: 300px;
-            border: 6px solid #000;
-            border-radius: 10px;
-            position: relative;
-            overflow: hidden;
-            background-color: #d1e3ff;
-            margin: 50px auto;
-            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        .tank-fill {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            background: linear-gradient(to top, #ffcc00, #ff9900);
-            transition: height 1s ease-in-out;
-            border-radius: 0 0 10px 10px;
-            box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-        .fill-percentage {
-            font-size: 20px;
-            font-weight: bold;
-            color: #ff9900;
-            margin-top: 20px;
-        }
-        .input-container {
-            margin-top: 20px;
-        }
-        .input-container input {
-            padding: 8px;
-            font-size: 16px;
-            width: 80px;
-            text-align: center;
-        }
-        .input-container button {
-            padding: 8px 12px;
-            font-size: 16px;
-            background-color: #ff9900;
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-left: 10px;
-            border-radius: 5px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dual Fuel Tank Indicator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #e0f7fa;
+    }
+
+    .tanks-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 50px;
+      margin-top: 40px;
+    }
+
+    .tank-container {
+      width: 120px;
+      height: 300px;
+      border: 6px solid #000;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      background-color: #d1e3ff;
+      box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .tank-fill {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background: linear-gradient(to top, #ffcc00, #ff9900);
+      transition: height 1s ease-in-out;
+      border-radius: 0 0 10px 10px;
+      box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .fill-percentage {
+      font-size: 20px;
+      font-weight: bold;
+      color: #ff9900;
+      margin-top: 10px;
+    }
+
+    .input-container {
+      margin-top: 15px;
+    }
+
+    .input-container input {
+      padding: 6px;
+      font-size: 16px;
+      width: 80px;
+      text-align: center;
+    }
+
+    .input-container button {
+      padding: 6px 12px;
+      font-size: 16px;
+      background-color: #ff9900;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-left: 5px;
+      border-radius: 5px;
+    }
+
+    .tank-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #statusBox {
+      margin-top: 30px;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 8px;
+    }
+  </style>
 </head>
-<body onload="setInterval(fetchTankLevel, 5000);">
-    <h1 style="color: #ff9900;">Fuel Tank Level</h1>
-    <div class="tank-container">
-        <div class="tank-fill" id="tankFill" style="height: 0%;"></div>
-    </div>
-    <p id="fillPercentage" class="fill-percentage">Loading...</p>
-    
-    <div class="input-container">
-        <input type="number" id="inputValue" placeholder="Enter value" />
-        <button onclick="sendValue()">Submit</button>
+<body onload="setInterval(fetchTank1Level, 5000)">
+  <h1 style="color: #ff9900;">Dual Fuel Tank Indicator</h1>
+
+  <div class="tanks-wrapper">
+    <!-- Tank 1: Display-only from field2 -->
+    <div class="tank-block">
+      <div class="tank-container">
+        <div class="tank-fill" id="tankFill1" style="height: 0%;"></div>
+      </div>
+      <p id="fillPercentage1" class="fill-percentage">Loading...</p>
+      <p><strong>Tank 1 (Read from Field 2)</strong></p>
     </div>
 
-    <script>
-        async function fetchTankLevel() {
-            try {
-                let response = await fetch('https://api.thingspeak.com/channels/2907018/fields/1.json?api_key=2M0WL9NSRX1R01WK&results=1');                
+    <!-- Tank 2: Input to field1 -->
+    <div class="tank-block">
+      <div class="tank-container">
+        <div class="tank-fill" id="tankFill2" style="height: 0%;"></div>
+      </div>
+      <p id="fillPercentage2" class="fill-percentage">Waiting input...</p>
+      <div class="input-container">
+        <input type="number" id="inputValue2" placeholder="Enter %" />
+        <button onclick="sendTank2Value()">Submit</button>
+      </div>
+      <p><strong>Tank 2 (Send to Field 1)</strong></p>
+    </div>
+  </div>
 
-                let data = await response.json();
-                let fillLevel = data.feeds[0].field1;
-                fillLevel = parseInt(fillLevel, 10);
-                
-                document.getElementById("tankFill").style.height = fillLevel + "%";
-                document.getElementById("fillPercentage").innerText = "Fuel Level: " + fillLevel + "%";
-            } catch (error) {
-                console.error("Error fetching tank level:", error);
-                document.getElementById("fillPercentage").innerText = "Error loading data";
-            }
+  <div id="statusBox">Status: Comparing levels...</div>
+
+  <script>
+    let tank1Level = null;
+    let tank2Level = null;
+
+    function compareTankLevels() {
+      const statusBox = document.getElementById("statusBox");
+
+      if (tank1Level !== null && tank2Level !== null) {
+        if (tank1Level === tank2Level) {
+          statusBox.innerText = "✅ All Tanks Fuel Level Correct";
+          statusBox.style.color = "green";
+        } else {
+          statusBox.innerText = "❌ Tank Level Mismatch";
+          statusBox.style.color = "red";
         }
-        
-        async function sendValue() {
-            let inputValue = document.getElementById("inputValue").value;
-            if (inputValue === "") {
-                alert("Please enter a value");
-                return;
-            }
-            
-            try {
-                let response = await fetch(`https://api.thingspeak.com/update?api_key=MF4S9JJ3OT534KF5&field1=${inputValue}`);
-                let result = await response.text();
-                if (result == 0) {
-                    alert("Failed to update value. Please try again.");
-                } else {
-                    alert("Value sent successfully!");
-                }
-            } catch (error) {
-                console.error("Error sending value:", error);
-                alert("Failed to send value");
-            }
+      }
+    }
+
+    // Tank 1 reads from field 2
+    async function fetchTank1Level() {
+      try {
+        const response = await fetch('https://api.thingspeak.com/channels/2907018/fields/2.json?api_key=2M0WL9NSRX1R01WK&results=1');
+        const data = await response.json();
+        tank1Level = parseInt(data.feeds[0].field2, 10);
+
+        document.getElementById("tankFill1").style.height = tank1Level + "%";
+        document.getElementById("fillPercentage1").innerText = "Fuel Level: " + tank1Level + "%";
+
+        compareTankLevels();
+      } catch (error) {
+        console.error("Error fetching Tank 1 level:", error);
+        document.getElementById("fillPercentage1").innerText = "Error loading data";
+      }
+    }
+
+    // Tank 2 sends input to field 1 and visually reflects it
+    async function sendTank2Value() {
+      const value = document.getElementById("inputValue2").value;
+      if (value === "") {
+        alert("Please enter a value.");
+        return;
+      }
+
+      try {
+        const response = await fetch(`https://api.thingspeak.com/update?api_key=MF4S9JJ3OT534KF5&field1=${value}`);
+        const result = await response.text();
+        if (result == 0) {
+          alert("Failed to update Tank 2 value.");
+        } else {
+          tank2Level = parseInt(value, 10);
+
+          document.getElementById("tankFill2").style.height = tank2Level + "%";
+          document.getElementById("fillPercentage2").innerText = "Fuel Level: " + tank2Level + "%";
+          alert("Tank 2 value sent successfully!");
+
+          compareTankLevels();
         }
-    </script>
+      } catch (error) {
+        console.error("Error sending Tank 2 value:", error);
+        alert("Failed to send value");
+      }
+    }
+  </script>
 </body>
 </html>
